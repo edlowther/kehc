@@ -26,6 +26,8 @@ USERNAME=<YOUR_USERNAME>
 PASSWORD=<YOUR_FTP_PASSWORD>
 ```
 
+For more information, please see the [data documentation](https://catalogue.ceda.ac.uk/uuid/46f8c1377f8849eeb8570b8ac9b26d86) and [FTP server documentation](https://help.ceda.ac.uk/article/280-ftp).
+
 ### Download the data
 
 With the virtual environment activated as above, you should now be able to run: 
@@ -37,3 +39,7 @@ python3 download-daily.py
 ```
 
 By default, this will transfer data from 1995 to 2022 to the `data` directory in your project folder. It requires approximately 105GB of disk space. 
+
+The variables of interest are average surface temperature (`tas`), minimum surface temperature (`tasmin`) and maximum surface temperature (`tasmax`). All three are available at the annual and monthly resolution; `tasmin` and `tasmax` are available as daily data. 
+
+For more information about the availability of variables in this dataset, please see [the documentation](https://www.metoffice.gov.uk/research/climate/maps-and-data/data/haduk-grid/datasets) on the Met Office website. 
