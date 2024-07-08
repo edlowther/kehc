@@ -1,1 +1,5 @@
 python-dotenv
+netCDF4
+fiona
+geopandas
+pyarrow
