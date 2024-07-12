@@ -1,4 +1,10 @@
 .env
 address_base_premium
-kehc-env
+kehc-env*
 *.nc
+shp/RGN*
+archive
+logs/*.txt
+processing/*.csv
+output/*parquet*
+london_df.csv
