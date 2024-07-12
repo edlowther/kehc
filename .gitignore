@@ -5,6 +5,6 @@ kehc-env*
 shp/RGN*
 archive
 logs/*.txt
-processing/*.csv
+in_progress/*.csv
 output/*parquet*
 london_df.csv
