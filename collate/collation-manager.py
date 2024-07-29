@@ -2,10 +2,11 @@ import os
 import sys
 import netCDF4
 import pandas as pd
+import numpy as np
 
 class CollationManager():
     def __init__(self):
-        self.years = [2020]
+        self.years = [2020,2021,2022]
         self.month = self.get_month()
         self.cadence = sys.argv[1]
         self.base_dir = '/home/ccaeelo/Scratch/kehc/'
@@ -54,12 +55,15 @@ class CollationManager():
                     for _, row in lookup_df.iterrows():
                         x = row['grid_x']
                         y = row['grid_y']
+                        value = data.variables[var][idx, y, x]
+                        if value is np.ma.masked:
+                            value = np.nan
                         grid_id = row['grid_id']
                         output.append({
                             'date': str(date),
                             'cadence': self.cadence,
                             'var_name': var,
-                            'value': data.variables[var][idx, y, x],
+                            'value': value,
                             'grid_id': grid_id,
                             'latitude': data.variables['latitude'][y, x],
                             'longitude': data.variables['longitude'][y, x]
