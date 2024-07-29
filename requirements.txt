@@ -3,3 +3,4 @@ netCDF4
 fiona
 geopandas
 pyarrow
+pytest
