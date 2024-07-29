@@ -7,4 +7,5 @@ archive
 logs/*.txt
 in_progress/*.csv
 output/*parquet*
-london_df.csv
+london_df*
+*__pycache__*
