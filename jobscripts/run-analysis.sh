@@ -6,8 +6,7 @@
 # Change this to suit your requirements.
 #$ -l h_rt=23:0:0
 
-# Request 1 gigabyte of RAM. Change this to suit your requirements.
-#$ -l mem=2G
+#$ -l mem=4G
 #$ -pe smp 1
 #$ -t 1:518
 
