@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#$ -l h_rt=23:0:0
+#$ -l h_rt=0:45:0
 #$ -l mem=2G
 #$ -pe smp 1
 #$ -t 1:518

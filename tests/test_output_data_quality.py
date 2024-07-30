@@ -32,6 +32,7 @@ def test_all_uprns_are_unique():
 def test_all_grid_ids_are_in_output_haduk_data():
     print(np.setdiff1d(lookup_df['grid_id'], output_df['grid_id']))
     print(np.setdiff1d(output_df['grid_id'], lookup_df['grid_id']))
+    print(np.setdiff1d(lookup_df.loc[lookup_df['is_masked'], 'unmasked_grid_id'], output_df['grid_id']))
     assert all(lookup_df['grid_id'].isin(output_df['grid_id']))
     assert all(lookup_df.loc[lookup_df['is_masked'], 'unmasked_grid_id'].isin(output_df['grid_id']))
 
@@ -98,12 +99,12 @@ def test_random_sample_of_unmasked_uprns_are_within_expected_distance_of_grid_ce
     uprn_points = []
     grid_points = []
     for _, row in sample_df.iterrows():
-        uprn_points.append(Point(float(row['longitude']), float(row['latitude'])))
-        y, x = row['grid_id'].split('_')
-        grid_points.append(Point(data.variables['longitude'][y, x], data.variables['latitude'][y, x]))
-    uprn_points = GeoSeries(uprn_points, crs='EPSG:4326').to_crs('EPSG:27700')
-    grid_points = GeoSeries(grid_points, crs='EPSG:4326').to_crs('EPSG:27700')
-    assert all(uprn_points.distance(grid_points) < grid_hypotenuse + tolerance_in_m)
+        uprn_points.append(Point(float(row['X']), float(row['Y'])))
+        y, x = map(int, row['grid_id'].split('_'))
+        grid_points.append(Point(data.variables['projection_x_coordinate'][x], data.variables['projection_y_coordinate'][y]))
+    uprn_points = GeoSeries(uprn_points, crs='EPSG:27700')
+    grid_points = GeoSeries(grid_points, crs='EPSG:27700')
+    assert all(uprn_points.distance(grid_points) <= grid_hypotenuse)
 
 def test_all_masked_uprns_are_between_bounds_of_expected_distance_of_grid_cell():
     tmp_df = lookup_df.loc[lookup_df['is_masked']]
@@ -111,12 +112,16 @@ def test_all_masked_uprns_are_between_bounds_of_expected_distance_of_grid_cell()
     data = netCDF4.Dataset(f'/home/ccaeelo/Scratch/kehc/haduk-data/monthly/tas_hadukgrid_uk_1km_mon_200201-200212.nc')
     uprn_points = []
     grid_points = []
+    uprn_reference_points = []
+    grid_reference_points = []
     for _, row in tmp_df.iterrows():
-        uprn_points.append(Point(float(row['longitude']), float(row['latitude'])))
-        y, x = row['unmasked_grid_id'].split('_')
-        grid_points.append(Point(data.variables['longitude'][y, x], data.variables['latitude'][y, x]))
-    uprn_points = GeoSeries(uprn_points, crs='EPSG:4326').to_crs('EPSG:27700')
-    grid_points = GeoSeries(grid_points, crs='EPSG:4326').to_crs('EPSG:27700')
+        uprn_points.append(Point(float(row['X']), float(row['Y'])))
+        uprn_reference_points.append(Point(float(row['longitude']), float(row['latitude'])))
+        y, x = map(int, row['unmasked_grid_id'].split('_'))
+        grid_points.append(Point(data.variables['projection_x_coordinate'][x], data.variables['projection_y_coordinate'][y]))
+        grid_reference_points.append(Point(data.variables['longitude'][y, x], data.variables['latitude'][y, x]))
+    uprn_points = GeoSeries(uprn_points, crs='EPSG:27700')
+    grid_points = GeoSeries(grid_points, crs='EPSG:27700')
     dists = uprn_points.distance(grid_points)
-    assert all(dists > half_grid_length - tolerance_in_m)
-    assert all(dists < grid_hypotenuse * 2 + tolerance_in_m)
+    assert all(dists >= half_grid_length)
+    assert all(dists <= grid_hypotenuse * 2)

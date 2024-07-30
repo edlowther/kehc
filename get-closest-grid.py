@@ -2,19 +2,14 @@ import sys
 import netCDF4
 import numpy as np
 import pandas as pd
-from sklearn.neighbors import BallTree
 
 STRIDE = 10000
 idx = int(sys.argv[1]) * STRIDE
 
-# Arbitrary choice of .nc file - loading just for lat/lon, not for tas:
+# Arbitrary choice of .nc file - loading just for lat/lon, and whether `tas` is masked, not actual `tas` values:
 data = netCDF4.Dataset('/home/ccaeelo/Scratch/kehc/haduk-data/annual/tas_hadukgrid_uk_1km_ann_200201-200212.nc')
-haduk_lats = data.variables['latitude'][:]
-haduk_lons = data.variables['longitude'][:]
-
-haduk_grid_points = np.stack((haduk_lats.flatten(), haduk_lons.flatten()), axis=-1)
-haduk_grid_points = np.deg2rad(haduk_grid_points)
-tree = BallTree(haduk_grid_points, leaf_size=30, metric='haversine')
+haduk_Ys = data.variables['projection_y_coordinate'][:]
+haduk_Xs = data.variables['projection_x_coordinate'][:]
 
 tas = data.variables['tas']
 
@@ -24,15 +19,14 @@ rows = []
 
 for _, row in london_df[idx-STRIDE:idx].iterrows():
     uprn = row['uprn']
-    abp_lat = row['latitude']
-    abp_lon = row['longitude']
+    abp_Y = row['Y']
+    abp_X = row['X']
 
-    _, closest_idxs = tree.query(np.deg2rad([[row['latitude'], row['longitude']]]), k=9)
-    k_idx = 0
-    closest_y, closest_x = np.unravel_index(closest_idxs[0][k_idx], data.variables['longitude'].shape)
+    dists_sq_y = (haduk_Ys - abp_Y)**2
+    dists_sq_x = (haduk_Xs - abp_X)**2
 
-    # dist_sq = (haduk_lats - abp_lat)**2 + (haduk_lons - abp_lon)**2
-    # closest_y, closest_x = np.unravel_index(np.argmin(dist_sq), dist_sq.shape)
+    closest_y = np.argmin(dists_sq_y)
+    closest_x = np.argmin(dists_sq_x)
 
     row = {
         'uprn': int(uprn), 
@@ -41,9 +35,15 @@ for _, row in london_df[idx-STRIDE:idx].iterrows():
     }
     is_masked = tas[0, closest_y, closest_x] is np.ma.masked
     row['is_masked'] = is_masked
+
+    if is_masked:
+        dist_mesh = np.array([[dist_sq_y + dist_sq_x for dist_sq_x in dists_sq_x] for dist_sq_y in dists_sq_y])
+
     while is_masked:
-        k_idx += 1
-        closest_y, closest_x = np.unravel_index(closest_idxs[0][k_idx], data.variables['longitude'].shape)
+        dist_mesh[closest_y, closest_x] = np.inf
+
+        closest_y, closest_x = np.unravel_index(np.argmin(dist_mesh), dist_mesh.shape)
+
         is_masked = tas[0, closest_y, closest_x] is np.ma.masked
         row['unmasked_grid_x'] = closest_x
         row['unmasked_grid_y'] = closest_y
@@ -51,4 +51,4 @@ for _, row in london_df[idx-STRIDE:idx].iterrows():
     rows.append(row)
 
 output_df = pd.DataFrame(rows)
-output_df.to_csv(f'/home/ccaeelo/Scratch/kehc/london_dfs-haversine/lookup_{idx:07}.csv', index=False)
+output_df.to_csv(f'/home/ccaeelo/Scratch/kehc/london_dfs/lookup_{idx:07}.csv', index=False)

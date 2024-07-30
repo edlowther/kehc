@@ -4,7 +4,7 @@ import numpy as np
 
 lookup_dfs = []
 
-base_dir = '/home/ccaeelo/Scratch/kehc/london_dfs-haversine'
+base_dir = '/home/ccaeelo/Scratch/kehc/london_dfs'
 for filename in os.listdir(base_dir):
     if filename != '.gitkeep':
         fp = os.path.join(base_dir, filename)
