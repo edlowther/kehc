@@ -79,7 +79,7 @@ This can be submitted on SGE using `qsub jobscripts/run-analysis.sh`. Because ea
 
 ### Data extraction from netCDF
 
-Finally, we need to bring together the Had-UK climate data for each of the closest grid cells to our London uprns. This is somewhat computationally expensive, mainly for the daily data, so we submit a job to SGE for this as well - `./jobscripts/run-collation.sh` - which makes use of a helper class `./collate/collation-manager.py`, where you can define which years of data you'd like to download the data for in the `self.years` attribute of the `CollationManager`. Use a list of integers for this (for just one year, set the list to be of length one). 
+Finally, we need to bring together the Had-UK climate data for each of the closest grid cells to our London uprns. This is somewhat computationally expensive, mainly for the daily data, so we submit a job to SGE for this as well - `./jobscripts/run-collation.sh` - which makes use of a helper class `./collate/collation-manager.py`, where you can define which years of data you'd like to download the data for in the `self.years` attribute of the `CollationManager`. Use a list of integers for this (for just one year, set the list to be of length one).
 
 On Myriad, this job will submit a further array of jobs to process the daily data in parallel (one task for each month). This is codified in `jobscripts/collation-helper.sh`. 
 
@@ -87,4 +87,4 @@ Once all of the above tasks are complete, run `python collate/all.py` to bring a
 
 ### Tests
 
-[TODO]
+Assumptions about the data are codified in `tests/test_output_data_quality.py`. To run: `python -m pytest`
