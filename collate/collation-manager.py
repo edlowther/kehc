@@ -35,8 +35,13 @@ class CollationManager():
 
     def run(self):
         lookup_fp = os.path.join(self.base_dir, 'output', 'lookup.parquet.gzip')
-        lookup_df = pd.read_parquet(lookup_fp)[['grid_id']].drop_duplicates()
-        lookup_df[['grid_y', 'grid_x']] = lookup_df['grid_id'].str.split('_', expand=True)
+        lookup_df = pd.read_parquet(lookup_fp)
+        all_grid_ids = pd.concat([
+            lookup_df['grid_id'], 
+            lookup_df.loc[lookup_df['is_masked'], 'unmasked_grid_id']
+        ]).drop_duplicates()
+        y_x_df = all_grid_ids.str.split('_', expand=True)
+        y_x_df.rename(columns={0: 'grid_y', 1: 'grid_x'}, inplace=True)
         if self.cadence == 'annual':
             vars = ['tas', 'tasmin', 'tasmax']
         elif self.cadence == 'monthly': 
@@ -52,13 +57,13 @@ class CollationManager():
                 data = netCDF4.Dataset(fp)
                 time = data.variables['time']
                 for idx, date in enumerate(netCDF4.num2date(time[:], time.units, time.calendar)):
-                    for _, row in lookup_df.iterrows():
-                        x = row['grid_x']
+                    for _, row in y_x_df.iterrows():
                         y = row['grid_y']
+                        x = row['grid_x']
                         value = data.variables[var][idx, y, x]
                         if value is np.ma.masked:
                             value = np.nan
-                        grid_id = row['grid_id']
+                        grid_id = f'{y}_{x}'
                         output.append({
                             'date': str(date),
                             'cadence': self.cadence,
