@@ -6,7 +6,7 @@ import numpy as np
 
 class CollationManager():
     def __init__(self):
-        self.years = [2020,2021,2022]
+        self.years = list(range(2005, 2023))
         self.month = self.get_month()
         self.cadence = sys.argv[1]
         self.base_dir = '/home/ccaeelo/Scratch/kehc/'

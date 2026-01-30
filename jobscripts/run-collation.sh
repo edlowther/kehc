@@ -11,11 +11,11 @@
 #$ -wd /home/ccaeelo/Scratch/kehc
 # cd $TMPDIR
 
-module unload gcc-libs
-module load gdal/3.1.3/gnu-9.2.0
-source kehc-env/bin/activate
+module load python/miniconda3/24.3.0-0
+source $UCL_CONDA_PATH/etc/profile.d/conda.sh
+conda activate kehc
 
 qsub jobscripts/collation-helper.sh 
 
-python collate/collation-manager.py annual
-python collate/collation-manager.py monthly
+# python collate/collation-manager.py annual
+# python collate/collation-manager.py monthly

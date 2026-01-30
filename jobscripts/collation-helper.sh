@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
-#$ -l h_rt=1:59:0
-#$ -l mem=2G
+#$ -l h_rt=11:59:0
+#$ -l mem=40G
 #$ -pe smp 1
 #$ -t 1:12
 #$ -N collate-nc-helper-array
@@ -12,7 +12,7 @@
 #$ -wd /home/ccaeelo/Scratch/kehc
 # cd $TMPDIR
 
-module unload gcc-libs
-module load gdal/3.1.3/gnu-9.2.0
-source kehc-env/bin/activate
+module load python/miniconda3/24.3.0-0
+source $UCL_CONDA_PATH/etc/profile.d/conda.sh
+conda activate kehc
 python collate/collation-manager.py daily $SGE_TASK_ID
