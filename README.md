@@ -6,7 +6,7 @@ The code on this page was designed to run on UCL's Myriad HPC system (with one e
 
 ```
 python3 -m venv ./kehc-env
-source ./kehc-env
+source ./kehc-env/bin/activate
 python3 -m pip install -r requirements.txt
 ```
 
