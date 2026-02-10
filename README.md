@@ -2,12 +2,14 @@
 
 ### Prerequisites
 
-The code on this page was designed to run on UCL's Myriad HPC system (with one exception, described below), where the recommended tool for working with python dependencies is `venv`, so we begin by creating and activating a virtual environment as follows:
+The code on this page was designed to run on UCL's Myriad HPC system. We begin by creating and activating a virtual environment as follows:
 
 ```
-python3 -m venv ./kehc-env
-source ./kehc-env/bin/activate
-python3 -m pip install -r requirements.txt
+module unload python
+module load python/miniconda3/24.3.0-0
+source $UCL_CONDA_PATH/etc/profile.d/conda.sh
+conda env create --file environment.yml
+conda activate kehc
 ```
 
 ### Data access
@@ -50,16 +52,8 @@ In our test case, we were interested in analysing data for London, so we needed 
 
 Having generated/downloaded the shapefile described above, we're going to use a command-line tool called `ogr2ogr` - one of many useful features of the open-source `gdal` software library - to filter our copy of the addressbase premium data, which we have in the geopackage (`gpkg`) format and we assume has been placed in the root directory of this project. 
 
-On Myriad we can recreate the conda environment codified in `environment.yml` as follows:
-```
-module unload python
-module load python/miniconda3/24.3.0-0
-source $UCL_CONDA_PATH/etc/profile.d/conda.sh
-conda env create --file environment.yml
-conda activate kehc
-```
 
-In the addressbase premium geopackage, the `e105_abprem_e_blpu` layer is the one that contains geospatial information: we assume this is available in the root directory for this project and use it to select the latitude and longitude of each uprn in London and save as a `csv` file.
+In the addressbase premium geopackage, the `e105_abprem_e_blpu` layer is the one that contains geospatial information: we use it to select the latitude and longitude of each uprn in London and save as a `csv` file.
 
 Filtering for London only would be as follows: 
 
