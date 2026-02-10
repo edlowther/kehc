@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 
 class CollationManager():
+    """Helper class to process the haduk input data, with features that vary according to whether the 
+    required output data is daily, monthly or annual.
+    """
     def __init__(self):
         self.years = list(range(2005, 2023))
         self.month = self.get_month()
@@ -12,19 +15,22 @@ class CollationManager():
         self.base_dir = '/home/ccaeelo/Scratch/kehc/'
 
     def get_month(self):
-        if len(sys.argv) > 2:
+        """Relevant for daily data only, as we split the task of processing daily data up by month"""
+        if self.cadence == 'daily' and len(sys.argv) > 2:
             month = int(sys.argv[2])
         else:
             month = None
         return month
     
     def get_n_days(self, year, month):
+        """For daily data, we need to know how many days in a month there are to determine the inpput filename"""
         if year % 4 == 0 and month == 2:
             return 29
         else:
             return int('_ 31 28 31 30 31 30 31 31 30 31 30 31'.split()[month])
 
     def fp_constructor(self, var, year, month):
+        """Locate the source data"""
         if self.cadence in ['annual', 'monthly']:
             cadence_abbr = self.cadence[:3]
             filename = f'{var}_hadukgrid_uk_1km_{cadence_abbr}_{year}01-{year}12.nc'
@@ -42,15 +48,19 @@ class CollationManager():
         ]).drop_duplicates()
         y_x_df = all_grid_ids.str.split('_', expand=True)
         y_x_df.rename(columns={0: 'grid_y', 1: 'grid_x'}, inplace=True)
-        if self.cadence == 'annual':
+        if self.cadence == 'annual' or self.cadence == 'monthly':
             vars = ['tas', 'tasmin', 'tasmax']
-        elif self.cadence == 'monthly': 
-            vars = ['tas']
         elif self.cadence == 'daily': 
             vars = ['tasmin', 'tasmax']
         else:
             raise ValueError('`cadence` must be one of annual, monthly or daily')
-        for year in self.years:
+        if self.cadence == 'monthly':
+            """We split the task of processing monthly data up by year"""
+            years = [self.years[int(sys.argv[2])-1]]
+        else:
+            years = self.years
+        for year in years:
+            print(year)
             output = []
             for var in vars:
                 fp = self.fp_constructor(var, year, self.month)
@@ -79,7 +89,7 @@ class CollationManager():
                 filename = f'{self.cadence}_{year}_{self.month:02}_df.csv'
             else:
                 filename = f'{self.cadence}_{year}_df.csv'
-            output_fp = os.path.join(self.base_dir, 'in_progress', filename)
+            output_fp = os.path.join(self.base_dir, 'in_progress', self.cadence, filename)
             haduk_df.to_csv(output_fp, index=False)
 
 collation_manager = CollationManager()

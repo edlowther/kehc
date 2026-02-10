@@ -12,11 +12,14 @@
 #$ -wd /home/ccaeelo/Scratch/kehc
 # cd $TMPDIR
 
-# module unload gcc-libs
-# module load gdal/3.1.3/gnu-9.2.0
-# source kehc-env/bin/activate
 module load python/miniconda3/24.3.0-0
 source $UCL_CONDA_PATH/etc/profile.d/conda.sh
 conda activate kehc
-TASK_ID=$(sed -n "${SGE_TASK_ID}p" tasks.txt)
-python get-closest-grid.py $TASK_ID
+
+# Useful method for hoovering up failed tasks:
+# TASK_ID=$(sed -n "${SGE_TASK_ID}p" tasks.txt)
+# python get-closest-grid.py $TASK_ID
+
+# Otherwise for standard processing, match -t flag with required number of files:
+python get-closest-grid.py $SGE_TASK_ID
+

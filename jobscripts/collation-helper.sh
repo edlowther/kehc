@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#$ -l h_rt=11:59:0
+#$ -l h_rt=47:59:0
 #$ -l mem=40G
 #$ -pe smp 1
 #$ -t 1:12
