@@ -46,7 +46,9 @@ For more information about the availability of variables in this dataset, please
 
 In our test case, we were interested in analysing data for London, so we needed to define what we mean by London; some python code to generate this is available [here](./utils/get-london-outline.py) - the output of this code is availalbe in the `shp` directory. 
 
-*Copyright notice: the source for this shapefile is Office for National Statistics licensed under the Open Government Licence v.3.0. Contains OS data © Crown copyright and database right 2024.* 
+*Copyright notice: the source for this shapefile is Office for National Statistics licensed under the Open Government Licence v.3.0. Contains OS data © Crown copyright and database right 2024.*
+
+*With the exception of the shapefile contained in the `shp` subdirectory, the repository is distributed under the MIT license.*
 
 ### Converting/filtering addressbase
 
